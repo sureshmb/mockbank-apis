@@ -15,11 +15,16 @@ Route::get('/', function () {
   return view('welcome');
 });
 
+// $router->get('/login',function(){
+// 	return view('/login');
+// });
+
 $router->group(['prefix' => env('API_VERSION')], function($router) {
 	$router->controller('user', 'UserController',[
 		'postAdd'						=>	'user.add',
 		'postVerifyOtp' 		=> 	'user.verify-otp',
 		'getResendOtp'			=>	'user.resend-otp',
-		'getAccountStatus'	=>	'user.account-status'
+		'getAccountStatus'	=>	'user.account-status',
+		'postLogin'					=>	'user.login'
 	]);
 });

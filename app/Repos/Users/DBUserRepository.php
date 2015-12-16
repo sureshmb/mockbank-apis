@@ -36,4 +36,8 @@ class DBUserRepository implements UserRepository {
 	public function firstUser() {
 		return $this->model->first();	
 	}
+
+	public function getUser($email) {
+		return $this->model->whereEmail($email)->first();
+	}
 }

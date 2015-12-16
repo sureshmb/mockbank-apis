@@ -14,6 +14,8 @@ use App\Http\Requests\LoginRequest;
 use App\Events\UserRegistered;
 use App\Repos\Users\UserRepository;
 use Auth;
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends AppController
 {
@@ -81,41 +83,36 @@ class UserController extends AppController
     return ['status' => 200, 'success' => false,'verified_status' => false, 'message' => 'Pending Verification'];  
   }
 
-  public function postLogin(LoginRequest $request) 
-  {
-    if($userInfo = Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-      $token = (new AppController)->generateOtp(40);
-      return ['status' => 200, 'success' => true, 'token' => $token, 'userData' =>Auth::user()];
+  public function postLogin(LoginRequest $request) {
+    $loginDetails = $request->only('email','password');
+    try {
+      if (! $token = JWTAuth::attempt($loginDetails)) {
+        return response()->json([
+          'status' => 401,
+          'success' =>  false,
+          'token'   =>  null,
+          'userData'  =>  null,
+          'message' => 'Invalid Credentials'
+        ], 401);
+      }
+    } catch (JWTException $e) {
+        return response()->json([
+          'status' => 500,
+          'success' =>  false,
+          'token'   =>  null,
+          'userData'  =>  null,
+          'message' => 'Internal Server Error'
+        ], 500);
     }
-    return ['status' => 200, 'success' => false, 'token' => null, 'userData' => null];
-  }
 
-  public function postSocialLogin(SocialLoginRequest $request) 
-  {
-    return [
-      'status'  =>  200,
-      'success'   =>  true,
-      'token'     =>  (new AppController)->generateOtp(40),
-      'userData'  =>  $this->userRepo->firstUser()
-    ];
-  }
+    return response()->json([
+      'status' => 200,
+      'success' =>  true,
+      'token'   =>  $token,
+      'userData'  =>  $this->userRepo->getUser($request->email),
+      'message' => 'Login Success'
+    ], 200);
 
-  public function getProfile($userId) 
-  {
-    return [
-      'status'  =>  200,
-      'success'   =>  true,
-      'userData'  =>  $this->userRepo->firstUser()
-    ];
-  }
-
-  public function postProfile() 
-  {
-    return [
-      'status'  =>  200,
-      'success'   =>  true,
-      'userData'  =>  $this->userRepo->firstUser()
-    ];
   }
 
 }
