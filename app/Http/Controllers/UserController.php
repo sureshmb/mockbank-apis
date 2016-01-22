@@ -115,4 +115,50 @@ class UserController extends AppController
 
   }
 
+  public function postAuthenticatedUser()
+  {
+    if (! $user = JWTAuth::parseToken()->authenticate()) {
+      return response()->json([
+        'status'  =>  404,
+        'success' =>  false,
+        'userData' => null,
+        'message'  => 'Invalid Token'
+      ], 404);
+    }
+    return response()->json([
+      'status'  =>  200,
+      'success' =>  true,
+      'userData' => $user,
+      'message'  => 'Valid Token'
+    ], 200);
+  }
+
+  public function postSocialLogin(SocialLoginRequest $request) 
+  {
+    return [
+      'status'  =>  200,
+      'success'   =>  true,
+      'token'     =>  (new AppController)->generateOtp(40),
+      'userData'  =>  $this->userRepo->firstUser()
+    ];
+  }
+
+  public function getProfile($userId) 
+  {
+    return [
+      'status'  =>  200,
+      'success'   =>  true,
+      'userData'  =>  $this->userRepo->firstUser()
+    ];
+  }
+
+  public function postProfile() 
+  {
+    return [
+      'status'  =>  200,
+      'success'   =>  true,
+      'userData'  =>  $this->userRepo->firstUser()
+    ];
+  }
+
 }

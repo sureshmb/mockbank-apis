@@ -1,4 +1,6 @@
 <?php
+use App\Models\Course;
+use App\Models\Benefit;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,4 +29,23 @@ $router->group(['prefix' => env('API_VERSION')], function($router) {
 		'getAccountStatus'	=>	'user.account-status',
 		'postLogin'					=>	'user.login'
 	]);
+
+	$router->controller('exams', 'ExamsController',[
+		'getList'						=>	'exams.list',
+		'getCourses'				=>	'exam.courses'
+	]);
+});
+
+// $router->get('seed-test',function(Course $course, Benefit $benefit){
+// 	$courses = $course->get();
+// 	$benefitIds = $benefit->lists('id')->toArray();
+// 	$randomKeys = array_rand($benefitIds, 10);
+// 	foreach($randomKeys as $randomKey) {
+		
+// 	}
+// });
+// 
+$router->get('debug', function(){
+	echo 'Dbugging';
+	\Debugbar::enable();
 });
